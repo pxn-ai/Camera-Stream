@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Pi Camera</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-gradient"></div>
+    <canvas id="particles"></canvas>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header glass">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">🎥</span>
+                    <h1>Advanced Pi Camera</h1>
+                </div>
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Connecting...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="themeToggle" title="Toggle Theme">🌓</button>
+                <button class="icon-btn" id="fullscreenBtn" title="Fullscreen">⛶</button>
+                <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Video Section -->
+            <section class="video-section">
+                <div class="video-container glass" id="videoContainer">
+                    <div class="video-glow"></div>
+                    <img id="videoFeed" src="/stream.mjpg" alt="Camera Feed" />
+                    <div class="video-overlay" id="videoOverlay">
+                        <div class="loading-spinner"></div>
+                        <span>Loading stream...</span>
+                    </div>
+                    <div class="recording-indicator" id="recordingIndicator">
+                        <span class="rec-dot"></span>
+                        <span>REC</span>
+                        <span id="recordingTime">00:00</span>
+                    </div>
+                    <div class="video-info" id="videoInfo">
+                        <span id="resolutionDisplay">1280x720</span>
+                        <span id="fpsDisplay">-- FPS</span>
+                    </div>
+                </div>
+
+                <!-- Control Bar -->
+                <div class="control-bar glass">
+                    <div class="control-group">
+                        <button class="control-btn" id="recordBtn" title="Record (R)">
+                            <span class="btn-icon">⏺️</span>
+                            <span class="btn-label">Record</span>
+                        </button>
+                        <button class="control-btn" id="snapshotBtn" title="Snapshot (Space)">
+                            <span class="btn-icon">📷</span>
+                            <span class="btn-label">Snapshot</span>
+                        </button>
+                        <button class="control-btn" id="zoomBtn" title="Zoom">
+                            <span class="btn-icon">🔍</span>
+                            <span class="btn-label">Zoom</span>
+                        </button>
+                    </div>
+                    <div class="zoom-slider-container" id="zoomSlider" style="display: none;">
+                        <input type="range" min="100" max="400" value="100" class="zoom-range" id="zoomRange">
+                        <span id="zoomValue">1.0x</span>
+                    </div>
+                </div>
+
+                <!-- Gallery Preview -->
+                <div class="gallery-preview glass" id="galleryPreview">
+                    <div class="gallery-header">
+                        <h3>🖼️ Gallery</h3>
+                        <button class="text-btn" id="viewAllBtn">View All →</button>
+                    </div>
+                    <div class="gallery-grid" id="galleryGrid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Side Panel -->
+            <aside class="side-panel">
+                <!-- Stats Card -->
+                <div class="card glass stats-card">
+                    <h3 class="card-title">📊 Live Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="statFps">--</span>
+                            <span class="stat-label">FPS</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="statFrames">0</span>
+                            <span class="stat-label">Frames</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="statUptime">00:00:00</span>
+                            <span class="stat-label">Uptime</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="statViewers">0</span>
+                            <span class="stat-label">Viewers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Camera Controls Card -->
+                <div class="card glass controls-card">
+                    <h3 class="card-title">🔧 Camera Controls</h3>
+                    <div class="control-sliders">
+                        <div class="slider-group">
+                            <label>Brightness</label>
+                            <div class="slider-wrapper">
+                                <input type="range" min="-100" max="100" value="0" id="brightnessSlider">
+                                <span class="slider-value" id="brightnessValue">0</span>
+                            </div>
+                        </div>
+                        <div class="slider-group">
+                            <label>Contrast</label>
+                            <div class="slider-wrapper">
+                                <input type="range" min="0" max="200" value="100" id="contrastSlider">
+                                <span class="slider-value" id="contrastValue">1.0</span>
+                            </div>
+                        </div>
+                        <div class="slider-group">
+                            <label>Saturation</label>
+                            <div class="slider-wrapper">
+                                <input type="range" min="0" max="200" value="100" id="saturationSlider">
+                                <span class="slider-value" id="saturationValue">1.0</span>
+                            </div>
+                        </div>
+                        <div class="slider-group">
+                            <label>Sharpness</label>
+                            <div class="slider-wrapper">
+                                <input type="range" min="0" max="200" value="100" id="sharpnessSlider">
+                                <span class="slider-value" id="sharpnessValue">1.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-selects">
+                        <div class="select-group">
+                            <label>Resolution</label>
+                            <select id="resolutionSelect" class="glass-select">
+                                <option value="640x480">640 × 480</option>
+                                <option value="1280x720" selected>1280 × 720</option>
+                                <option value="1920x1080">1920 × 1080</option>
+                            </select>
+                        </div>
+                        <div class="select-group">
+                            <label>AWB Mode</label>
+                            <select id="awbSelect" class="glass-select">
+                                <option value="auto">Auto</option>
+                                <option value="daylight">Daylight</option>
+                                <option value="cloudy">Cloudy</option>
+                                <option value="tungsten">Tungsten</option>
+                                <option value="fluorescent">Fluorescent</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="reset-btn" id="resetBtn">↺ Reset to Defaults</button>
+                </div>
+
+                <!-- Keyboard Shortcuts -->
+                <div class="card glass shortcuts-card">
+                    <h3 class="card-title">⌨️ Shortcuts</h3>
+                    <div class="shortcuts-list">
+                        <div class="shortcut"><kbd>Space</kbd> Snapshot</div>
+                        <div class="shortcut"><kbd>R</kbd> Record</div>
+                        <div class="shortcut"><kbd>F</kbd> Fullscreen</div>
+                        <div class="shortcut"><kbd>G</kbd> Gallery</div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div class="modal" id="galleryModal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>🖼️ Capture Gallery</h2>
+                <button class="close-btn" id="closeGallery">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="gallery-full" id="galleryFull">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div class="modal" id="imageModal">
+        <div class="image-viewer">
+            <button class="nav-btn prev" id="prevImage">‹</button>
+            <img id="viewerImage" src="" alt="Capture">
+            <button class="nav-btn next" id="nextImage">›</button>
+            <button class="close-btn viewer-close" id="closeViewer">✕</button>
+            <div class="viewer-info">
+                <span id="viewerFilename"></span>
+                <button class="delete-btn" id="deleteImage">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
